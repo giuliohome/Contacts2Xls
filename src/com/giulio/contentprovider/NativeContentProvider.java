@@ -1,15 +1,19 @@
-package com.sai.contentprovider;
+package com.giulio.contentprovider;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.giulio.contentprovider.R;
+
 import jxl.Sheet;
+import jxl.Workbook;
 import jxl.write.Label;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
+
 import android.app.Activity;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
@@ -38,46 +42,32 @@ public class NativeContentProvider extends Activity {
 
             Button view = (Button)findViewById(R.id.viewButton);
             Button add = (Button)findViewById(R.id.createButton);
-            Button modify = (Button)findViewById(R.id.updateButton);
-            Button delete = (Button)findViewById(R.id.deleteButton);
             
             
             view.setOnClickListener(new OnClickListener() {
              	public void onClick(View v){
-            		displayContacts();
-            		Log.i("NativeContentProvider", "Completed Displaying Contact list");
+            		exportContacts("/Contacts2Xls");
+            		Log.i("Contacts2Xls", "Completed Exporting Contact numbers");
             	}
             });
 
             add.setOnClickListener(new OnClickListener() {
              	public void onClick(View v){
-            		createContact("Sample Name", "123456789");
-            		Log.i("NativeContentProvider", "Created a new contact, of course hard-coded");
+            		createContacts("/Contacts2Xls");
+            		Log.i("Contacts2Xls", "Completed Exporting Contact numbers");
             	}
             });
             
-            modify.setOnClickListener(new OnClickListener() {
-            	public void onClick(View v) {
-            		updateContact("Sample Name", "987654321");
-            		Log.i("NativeContentProvider", "Completed updating the email id, if applicable");
-            	}
-            });
             
-            delete.setOnClickListener(new OnClickListener() {
-            	public void onClick(View v) {
-            		deleteContact("Sample Name");
-            		Log.i("NativeContentProvider", "Deleted the just created contact");
-            	}
-            });
     }
     
-    private void displayContacts() {
+    private void exportContacts(String path) {
     	WritableWorkbook wb;
     	WritableSheet sheet;
     	int row=1;
     	try {
     		File sdCard = Environment.getExternalStorageDirectory();
-    		File dir = new File(sdCard.getAbsolutePath() + "/MyOpenTweet");
+    		File dir = new File(sdCard.getAbsolutePath() + path);
     		dir.mkdirs();
     		File wbfile = new File(dir,"MyExportedContacts.xls");
 			 wb = jxl.Workbook.createWorkbook(wbfile);
@@ -88,6 +78,7 @@ public class NativeContentProvider extends Activity {
 			return;
 		}
     	ContentResolver cr = getContentResolver();
+    	
         Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
                 null, null, null, null);
         if (cur.getCount() > 0) {
@@ -104,13 +95,22 @@ public class NativeContentProvider extends Activity {
                      while (pCur.moveToNext()) {
                     	 String phoneNo = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                     	 //Toast.makeText(NativeContentProvider.this, "Name: " + name + ", Phone No: " + phoneNo, Toast.LENGTH_SHORT).show();
+                    	 String type = pCur.getString(pCur.getColumnIndex(ContactsContract.RawContacts.ACCOUNT_TYPE));
+                    	 String account = pCur.getString(pCur.getColumnIndex(ContactsContract.RawContacts.ACCOUNT_NAME));
+                    	 
                     	 if (name == null) continue;
                     	 Label label1 = new Label(1,row,name);
                     	 Label label2 = new Label(2,row,phoneNo);
+                    	 Label label3 = new Label(3,row,type);
+                    	 Label label4 = new Label(4,row,account);
+                    	 
+                    	 
                     	 row++;
                     	 try {
 							sheet.addCell(label1);
 							sheet.addCell(label2);
+							sheet.addCell(label3);
+							sheet.addCell(label4);
 						} catch (RowsExceededException e) {
 							Toast.makeText(NativeContentProvider.this,e.getMessage(), Toast.LENGTH_SHORT).show();
 							return;
@@ -136,12 +136,12 @@ public class NativeContentProvider extends Activity {
 		}
     }
     
-    private void createContact(String name, String phone) {
+    private void createContact(String name, String phone, String type, String account) {
     	ContentResolver cr = getContentResolver();
     	
     	Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
                 null, null, null, null);
-        
+    	
     	if (cur.getCount() > 0) {
         	while (cur.moveToNext()) {
         		String existName = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
@@ -154,8 +154,8 @@ public class NativeContentProvider extends Activity {
     	
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
         ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
-                .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, "com.google")
-                .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, "accountname@gmail.com")
+                .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, type)
+                .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, account)
                 .build());
         ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
                 .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
@@ -182,69 +182,49 @@ public class NativeContentProvider extends Activity {
 			e.printStackTrace();
 		}
 
-    	Toast.makeText(NativeContentProvider.this, "Created a new contact with name: " + name + " and Phone No: " + phone, Toast.LENGTH_SHORT).show();
+    }
+       
+    private void createContacts(String path) {
+
+        
+    	Workbook wb;
+    	Sheet sheet;
+    	int row=1;
+    	try {
+    		File sdCard = Environment.getExternalStorageDirectory();
+    		File dir = new File(sdCard.getAbsolutePath() + path);
+    		dir.mkdirs();
+    		File wbfile = new File(dir,"MyExportedContacts.xls");
+			 wb = jxl.Workbook.getWorkbook(wbfile);
+			 sheet = wb.getSheet("Contacts");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			Toast.makeText(NativeContentProvider.this,e.getMessage(), Toast.LENGTH_SHORT).show();
+			return;
+		}
+    	
+    	
+    	row = 1;
+    	String name=sheet.getCell(1, row).getContents();
+    	String phone=sheet.getCell(2, row).getContents();
+    	String type=sheet.getCell(3, row).getContents();
+    	String account=sheet.getCell(4, row).getContents();
+    	int rows = sheet.getRows();
+    	while (name != null && name.length()>0)
+    	{
+    		createContact(name,phone, type, account);
+    		row++;
+    		if (row == rows) break;
+    		name=sheet.getCell(1, row).getContents();
+    		phone=sheet.getCell(2, row).getContents();
+    		type=sheet.getCell(3, row).getContents();
+    		account=sheet.getCell(4, row).getContents();
+    	}
+    	
+    	
+    	Toast.makeText(NativeContentProvider.this, "Imported contacts from folder: " + path, Toast.LENGTH_SHORT).show();
     	
     }
     
-    private void updateContact(String name, String phone) {
-    	ContentResolver cr = getContentResolver();
- 
-        String where = ContactsContract.Data.DISPLAY_NAME + " = ? AND " + 
-        			ContactsContract.Data.MIMETYPE + " = ? AND " +
-        			String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE) + " = ? ";
-        String[] params = new String[] {name,
-        		ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
-        		String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_HOME)};
 
-        Cursor phoneCur = managedQuery(ContactsContract.Data.CONTENT_URI, null, where, params, null);
-        
-        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-        
-        if ( (null == phoneCur)  ) {
-        	createContact(name, phone);
-        } else {
-        	ops.add(ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
-        	        .withSelection(where, params)
-        	        .withValue(ContactsContract.CommonDataKinds.Phone.DATA, phone)
-        	        .build());
-        }
-        
-        phoneCur.close();
-        
-        try {
-			cr.applyBatch(ContactsContract.AUTHORITY, ops);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (OperationApplicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		Toast.makeText(NativeContentProvider.this, "Updated the phone number of 'Sample Name' to: " + phone, Toast.LENGTH_SHORT).show();
-    }
-    
-    private void deleteContact(String name) {
-
-    	ContentResolver cr = getContentResolver();
-    	String where = ContactsContract.Data.DISPLAY_NAME + " = ? ";
-    	String[] params = new String[] {name};
-    
-        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-        ops.add(ContentProviderOperation.newDelete(ContactsContract.RawContacts.CONTENT_URI)
-    	        .withSelection(where, params)
-    	        .build());
-        try {
-			cr.applyBatch(ContactsContract.AUTHORITY, ops);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (OperationApplicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		Toast.makeText(NativeContentProvider.this, "Deleted the contact with name '" + name +"'", Toast.LENGTH_SHORT).show();
-  
-    }
 }
