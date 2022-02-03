@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">This is a simple app to import and export the contact numbers to excel xls</string>
+    <string name="app_name">Contact2Xls</string>
+<string name="viewButton">Export Contacts</string>
+<string name="createButton">Import Contacts</string>
+<string name="updateButton">Modify Contact</string>
+<string name="deleteButton">Delete Contact</string>
+</resources>

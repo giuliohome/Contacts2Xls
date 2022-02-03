@@ -30,12 +30,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 
 public class NativeContentProvider extends Activity implements showMsg {
@@ -90,6 +88,7 @@ public class NativeContentProvider extends Activity implements showMsg {
              						Manifest.permission.WRITE_EXTERNAL_STORAGE},
              	                MY_PERMISSIONS_REQUEST_SelectXlsContacts);
              		} else {
+						ContactsListActivity.arrayOfContacts.clear();
              			selectXlsContacts(xlsName.getText().toString());
              		}
 					
