@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+       	<LinearLayout android:orientation="vertical"
+		android:layout_toRightOf="@id/importContactBt"
+		android:layout_toLeftOf="@+id/removeContactBt"
+   	    android:layout_width="wrap_content"
+   	    android:layout_height="wrap_content" >
+   	    <LinearLayout android:orientation="horizontal"
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content">
+		    <EditText
+		      android:id="@+id/tvName"
+		      android:layout_width="wrap_content"
+		      android:layout_height="wrap_content"
+    		android:layout_marginLeft="5dp"
+    		android:layout_marginRight="5dp" />
+		   <EditText
+		      android:id="@+id/tvNumber"
+		      android:layout_width="wrap_content"
+		      android:layout_height="wrap_content"
+		      android:text="@string/tvNumber"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="10dp"/>   	    
+   		</LinearLayout>
+   	    <LinearLayout android:orientation="horizontal"
+   	        android:weightSum = "2"
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content">
+		    <EditText
+		      android:id="@+id/tvType"
+		      android:layout_weight = "1"
+		      android:layout_width="wrap_content"
+		      android:layout_height="wrap_content"
+		      android:text="@string/tvType"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="10dp"  />
+		   <EditText
+		      android:id="@+id/tvAccount"
+		      android:layout_weight = "1"
+		      android:layout_width="wrap_content"
+		      android:layout_height="wrap_content"
+		      android:text="@string/tvAccount"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="10dp"
+     />   	    
+   		</LinearLayout>
+   	</LinearLayout>
+   	<Button		    	
+				android:id="@+id/addnewitem_bt" 
+				android:text="@string/addnewitem_bt"
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content" />
+
+</LinearLayout>

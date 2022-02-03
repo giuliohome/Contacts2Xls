@@ -2,8 +2,28 @@
 <resources>
     <string name="hello">This is a simple app to import and export the contact numbers to excel xls</string>
     <string name="app_name">Contact2Xls</string>
-<string name="viewButton">Export Contacts</string>
-<string name="createButton">Import Contacts</string>
+<string name="viewButton">Export All Phone Contacts</string>
+<string name="selectButton">Select Phone Contacts</string>
+<string name="createButton">Import All Contacts from xls</string>
 <string name="updateButton">Modify Contact</string>
 <string name="deleteButton">Delete Contact</string>
+<string name="openXlsButton">Open Contacts from xls</string>
+<string name="mergeButton">Open xls and add from Phone</string>
+<string name="lvContactItems">Contact List</string>
+<string name="tvName">Contact Name</string>
+<string name="tvNumber">Contact Number</string>
+<string name="tvType">Contact Type</string>
+<string name="tvAccount">Contact Account</string>
+<string name="importContactBt">Import</string>
+<string name="exportContactBt">Export</string>
+<string name="removeContactBt">Del</string> 
+<string name="newitem_ll">New Layout</string>
+<string name="saveitems_ll">Save Layout</string>
+<string name="newitem_bt">New</string>
+<string name="addnewitem_bt">Add New</string>
+<string name="saveitems_bt">Save</string>
+<string name="xls_name_open">MyExportedContacts.xls</string>
+<string name="xls_name_save">MyExportedContacts.xls</string>
+<string name="ContactListActivity">Contact List</string>
+<string  name="SelectContactActivity">Select Contact</string>
 </resources>

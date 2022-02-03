@@ -1,17 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
+<EditText  
+		android:id="@+id/xls_name_open" 
+		android:text="@string/xls_name_open" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" />
 <Button 
 	android:text="@string/viewButton" 
 	android:id="@+id/viewButton" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:layout_gravity="center_horizontal">
+</Button>
+<Button 
+	android:text="@string/selectButton" 
+	android:id="@+id/selectButton" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:layout_gravity="center_horizontal">
+</Button>
+<Button 
+	android:text="@string/mergeButton" 
+    android:id="@+id/mergeButton"
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:layout_gravity="center_horizontal">
+</Button>
+<Button 
+	android:text="@string/openXlsButton" 
+	android:id="@+id/openXlsButton" 
 	android:layout_width="wrap_content" 
 	android:layout_height="wrap_content"
 	android:layout_gravity="center_horizontal">

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      android:versionCode="2"
-      android:versionName="1.2" package="com.giulio.contentprovider">
+      android:versionCode="11"
+      android:versionName="1.11" package="com.giulio.contentprovider">
     <application android:icon="@drawable/icon" android:label="@string/app_name">
         <activity android:name=".NativeContentProvider"
                   android:label="@string/app_name">
@@ -10,8 +10,36 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:label="@string/SelectContactActivity"
+            android:name="com.giulio.contentprovider.MergeContactactivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.giulio.contentprovider.NativeContentProvider" />
+        </activity>
+        <activity
+            android:label="@string/SelectContactActivity"
+            android:name="com.giulio.contentprovider.SelectContactActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.giulio.contentprovider.NativeContentProvider" />
+        </activity>
+        <activity
+            android:label="@string/ContactListActivity"
+            android:name="com.giulio.contentprovider.ContactsListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.giulio.contentprovider.NativeContentProvider" />
+        </activity>
+        <activity
+            android:name="com.giulio.contentprovider.NewContactActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.giulio.contentprovider.ContactListActivity" />
+        </activity>
     </application>
-    <uses-sdk android:minSdkVersion="10" />
+    <uses-sdk android:minSdkVersion="20"
+        android:targetSdkVersion="29"  />
 <uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
 <uses-permission android:name="android.permission.WRITE_CONTACTS"></uses-permission>
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
