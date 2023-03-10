@@ -14,6 +14,7 @@ import jxl.write.biff.RowsExceededException;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -39,6 +40,7 @@ public class ContactsListActivity extends Activity implements showMsg {
 	private static final int MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE = 17;
 	private static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 18;
 	private static final int MY_PERMISSIONS_MANAGE_EXTERNAL_STORAGE = 19;
+	private static Context context;
 
 	private void showMsg(String msg) {
     	Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
@@ -56,8 +58,10 @@ public class ContactsListActivity extends Activity implements showMsg {
     	WritableSheet sheet;
     	int row=1;
     	try {
-    		File sdCard = Environment.getExternalStorageDirectory();
-    		File dir = new File(sdCard.getAbsolutePath() + "/Contacts2Xls");
+    		//File sdCard = Environment.getExternalStorageDirectory();
+			;
+    		File dir = context.getExternalFilesDir(null);
+					// new File(sdCard.getAbsolutePath() + "/Contacts2Xls");
     		dir.mkdirs();
     		File wbfile = new File(dir,xlsname);
 			 wb = jxl.Workbook.createWorkbook(wbfile);
@@ -118,69 +122,8 @@ public class ContactsListActivity extends Activity implements showMsg {
 			open_xls_name= (String) savedInstanceState.getSerializable("open_xls_name");
 		}
 
-		ActivityCompat.requestPermissions(this,
-				new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE},
-				MY_PERMISSIONS_MANAGE_EXTERNAL_STORAGE);
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
-			// Permission is not granted
-			if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-					Manifest.permission.MANAGE_EXTERNAL_STORAGE)) {
-				// Show an explanation to the user *asynchronously* -- don't block
-				// this thread waiting for the user's response! After the user
-				// sees the explanation, try again to request the permission.
-			} else {
-				// No explanation needed; request the permission
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE},
-						MY_PERMISSIONS_MANAGE_EXTERNAL_STORAGE);
-			}
-		}
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-			if (!Environment.isExternalStorageManager()) {
-				Intent intent = new Intent();
-				intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-				Uri uri = Uri.fromParts("package", this.getPackageName(), null);
-				intent.setData(uri);
-				startActivity(intent);
-			}
-		}
-
-		ActivityCompat.requestPermissions(this,
-				new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-				MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
-			// Permission is not granted
-			if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-					Manifest.permission.READ_EXTERNAL_STORAGE)) {
-				// Show an explanation to the user *asynchronously* -- don't block
-				// this thread waiting for the user's response! After the user
-				// sees the explanation, try again to request the permission.
-			} else {
-				// No explanation needed; request the permission
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-						MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
-			}
-		}
-		ActivityCompat.requestPermissions(this,
-				new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-				MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE);
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
-			// Permission is not granted
-			if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-					Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-				// Show an explanation to the user *asynchronously* -- don't block
-				// this thread waiting for the user's response! After the user
-				// sees the explanation, try again to request the permission.
-			} else {
-				// No explanation needed; request the permission
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE);
-			}
-		}
-		arrayOfContacts = Contact.fromXls("/Contacts2Xls", open_xls_name, this);
+		arrayOfContacts = Contact.fromXls(context, open_xls_name, this);
 		// CrearrayOfContactsate the adapter to convert the array to views
 		itemsAdapter = new ContactAdapter(this, arrayOfContacts);
 		// Attach the adapter to a ListView
@@ -202,8 +145,8 @@ public class ContactsListActivity extends Activity implements showMsg {
 
 
         });
-		
-		
+
+		context = getApplicationContext();
 		
 		Button newBt = (Button) this.findViewById(R.id.newitem_bt);
 		newBt.setOnClickListener(new OnClickListener() {

@@ -46,7 +46,7 @@ public class MergeContactactivity extends Activity implements showMsg {
 		}
 		
 		ContentResolver cr = getContentResolver();
-		SelectContactActivity.saveMe =  Contact.fromXls("/Contacts2Xls", open_xls_name, this);
+		SelectContactActivity.saveMe =  Contact.fromXls(getApplicationContext(), open_xls_name, this);
 		ArrayList<Contact> mergedList = new ArrayList<Contact>();
 		mergedList.addAll(SelectContactActivity.saveMe);
 		mergedList.addAll( Contact.fromAndroid(cr));

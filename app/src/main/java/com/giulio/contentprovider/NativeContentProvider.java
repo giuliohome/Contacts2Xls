@@ -17,6 +17,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.pm.PackageManager;
@@ -64,7 +65,7 @@ public class NativeContentProvider extends Activity implements showMsg {
              						Manifest.permission.WRITE_EXTERNAL_STORAGE},
              	                MY_PERMISSIONS_REQUEST_ExportContacts);
              		} else {
-                		exportContacts("/Contacts2Xls",xlsName.getText().toString());
+                		exportContacts(getApplicationContext(),xlsName.getText().toString());
                 		showMsg("Completed Exporting Contact numbers");
              		}
             	}
@@ -78,14 +79,10 @@ public class NativeContentProvider extends Activity implements showMsg {
              		        != PackageManager.PERMISSION_GRANTED ||
              		    ContextCompat.checkSelfPermission(thisClass,
                     		 Manifest.permission.WRITE_CONTACTS)
-                    		 != PackageManager.PERMISSION_GRANTED ||
-                  		ContextCompat.checkSelfPermission(thisClass,
-                             Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                             != PackageManager.PERMISSION_GRANTED  ) {
+                    		 != PackageManager.PERMISSION_GRANTED ) {
              			ActivityCompat.requestPermissions(thisClass,
              	                new String[]{Manifest.permission.READ_CONTACTS,
-             						Manifest.permission.WRITE_CONTACTS,
-             						Manifest.permission.WRITE_EXTERNAL_STORAGE},
+             						Manifest.permission.WRITE_CONTACTS},
              	                MY_PERMISSIONS_REQUEST_SelectXlsContacts);
              		} else {
 						ContactsListActivity.arrayOfContacts.clear();
@@ -102,14 +99,10 @@ public class NativeContentProvider extends Activity implements showMsg {
              		        != PackageManager.PERMISSION_GRANTED ||
                  		    ContextCompat.checkSelfPermission(thisClass,
                            		 Manifest.permission.WRITE_CONTACTS)
-                           		 != PackageManager.PERMISSION_GRANTED ||
-                         		ContextCompat.checkSelfPermission(thisClass,
-                                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                                    != PackageManager.PERMISSION_GRANTED) {
+                           		 != PackageManager.PERMISSION_GRANTED)  {
              			ActivityCompat.requestPermissions(thisClass,
              	                new String[]{Manifest.permission.READ_CONTACTS,
-             						Manifest.permission.WRITE_CONTACTS,
-             						Manifest.permission.WRITE_EXTERNAL_STORAGE},
+             						Manifest.permission.WRITE_CONTACTS},
              	                MY_PERMISSIONS_REQUEST_CreateContacts);
              		} else {
                 		createContacts("/Contacts2Xls",xlsName.getText().toString());
@@ -128,14 +121,10 @@ public class NativeContentProvider extends Activity implements showMsg {
              		        != PackageManager.PERMISSION_GRANTED ||
                  		    ContextCompat.checkSelfPermission(thisClass,
                            		 Manifest.permission.WRITE_CONTACTS)
-                           		 != PackageManager.PERMISSION_GRANTED ||
-                         		ContextCompat.checkSelfPermission(thisClass,
-                                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                                    != PackageManager.PERMISSION_GRANTED) {
+                           		 != PackageManager.PERMISSION_GRANTED ) {
              			ActivityCompat.requestPermissions(thisClass,
              	                new String[]{Manifest.permission.READ_CONTACTS,
-             						Manifest.permission.WRITE_CONTACTS,
-             						Manifest.permission.WRITE_EXTERNAL_STORAGE},
+             						Manifest.permission.WRITE_CONTACTS},
              	                MY_PERMISSIONS_REQUEST_OpenXlsContacts);
              		} else {
                 		openXlsContacts(xlsName.getText().toString());
@@ -153,14 +142,10 @@ public class NativeContentProvider extends Activity implements showMsg {
              		        != PackageManager.PERMISSION_GRANTED ||
                  		    ContextCompat.checkSelfPermission(thisClass,
                            		 Manifest.permission.WRITE_CONTACTS)
-                           		 != PackageManager.PERMISSION_GRANTED ||
-                         		ContextCompat.checkSelfPermission(thisClass,
-                                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                                    != PackageManager.PERMISSION_GRANTED) {
+                           		 != PackageManager.PERMISSION_GRANTED ) {
              			ActivityCompat.requestPermissions(thisClass,
              	                new String[]{Manifest.permission.READ_CONTACTS,
-             						Manifest.permission.WRITE_CONTACTS,
-             						Manifest.permission.WRITE_EXTERNAL_STORAGE},
+             						Manifest.permission.WRITE_CONTACTS},
              	                MY_PERMISSIONS_REQUEST_MergeContacts);
              		} else {
                 		mergeContacts(xlsName.getText().toString());
@@ -183,14 +168,13 @@ public class NativeContentProvider extends Activity implements showMsg {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_ExportContacts: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length == 3
+                if (grantResults.length == 2
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                    && grantResults[1] == PackageManager.PERMISSION_GRANTED
-                    && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                    && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                 	EditText xlsName = (EditText)findViewById(R.id.xls_name_open);
-            		exportContacts("/Contacts2Xls",xlsName.getText().toString());
+            		exportContacts(getApplicationContext(),xlsName.getText().toString());
             		showMsg("Completed Exporting Contact numbers");
                 } else {
                     // permission denied, boo! Disable the
@@ -205,10 +189,9 @@ public class NativeContentProvider extends Activity implements showMsg {
             
             case MY_PERMISSIONS_REQUEST_SelectXlsContacts: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length == 3
+                if (grantResults.length == 2
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                 	EditText xlsName = (EditText)findViewById(R.id.xls_name_open);
@@ -224,10 +207,9 @@ public class NativeContentProvider extends Activity implements showMsg {
             
             case MY_PERMISSIONS_REQUEST_CreateContacts: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length == 3
+                if (grantResults.length == 2
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                 	EditText xlsName = (EditText)findViewById(R.id.xls_name_open);
@@ -244,10 +226,9 @@ public class NativeContentProvider extends Activity implements showMsg {
             
             case MY_PERMISSIONS_REQUEST_OpenXlsContacts: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length == 3
+                if (grantResults.length == 2
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                 	EditText xlsName = (EditText)findViewById(R.id.xls_name_open);
@@ -264,10 +245,9 @@ public class NativeContentProvider extends Activity implements showMsg {
             
             case MY_PERMISSIONS_REQUEST_MergeContacts: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length == 3
+                if (grantResults.length == 2
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                 	EditText xlsName = (EditText)findViewById(R.id.xls_name_open);
@@ -293,13 +273,14 @@ public class NativeContentProvider extends Activity implements showMsg {
 	public void showText(String msg) {
 		showMsg(msg);
 	}
-    private void exportContacts(String path, String xlsname) {
+    private void exportContacts(Context context, String xlsname) {
     	WritableWorkbook wb;
     	WritableSheet sheet;
     	int row=1;
     	try {
-    		File sdCard = Environment.getExternalStorageDirectory();
-    		File dir = new File(sdCard.getAbsolutePath() + path);
+    		// File sdCard = Environment.getExternalStorageDirectory();
+    		File dir = context.getExternalFilesDir(null);
+					// new File(sdCard.getAbsolutePath() + path);
     		dir.mkdirs();
     		File wbfile = new File(dir,xlsname);
 			 wb = jxl.Workbook.createWorkbook(wbfile);

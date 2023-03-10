@@ -79,7 +79,7 @@ public class Contact {
 		return arrayOfContacts;
     }
     
-	public static ArrayList<Contact> fromXls(String path, String xlsname, showMsg delegate) {
+	public static ArrayList<Contact> fromXls(Context context, String xlsname, showMsg delegate) {
 		ArrayList<Contact> contacts = new ArrayList<Contact>();
         
 		Workbook wb;
@@ -87,7 +87,7 @@ public class Contact {
     	int row=1;
     	try {
     		File sdCard = Environment.getExternalStorageDirectory();
-    		File dir = new File(sdCard.getAbsolutePath() + path);
+    		File dir = context.getExternalFilesDir(null);
     		dir.mkdirs();
     		File wbfile = new File(dir,xlsname);
 			 wb = jxl.Workbook.getWorkbook(wbfile);

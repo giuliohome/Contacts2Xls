@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:versionCode="14"
-    android:versionName="1.14"
+    android:versionCode="16"
+    android:versionName="1.16"
     package="com.giulio.contentprovider">
     <application android:requestLegacyExternalStorage="true" android:preserveLegacyExternalStorage="true" android:icon="@drawable/icon" android:label="@string/app_name">
-        <activity android:name=".NativeContentProvider"
+        <activity android:exported="true" android:name=".NativeContentProvider"
                   android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -40,11 +40,7 @@
                 android:value="com.giulio.contentprovider.ContactsListActivity" />
         </activity>
     </application>
-    <uses-sdk android:targetSdkVersion="30"  />
+    <uses-sdk android:targetSdkVersion="31"  />
 <uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
 <uses-permission android:name="android.permission.WRITE_CONTACTS"></uses-permission>
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage"/>
 </manifest> 
