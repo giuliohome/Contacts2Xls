@@ -7,8 +7,8 @@ android {
         applicationId "com.giulio.contentprovider"
         minSdk 20
         targetSdk 36
-        versionCode 18
-        versionName "1.18"
+        versionCode 19
+        versionName "1.19"
     }
 
     buildTypes {
@@ -22,5 +22,8 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     // compile files('libs/android-support-v4.jar')
-    implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
+    // jxl logs via its own SimpleLogger; log4j is unused and only adds network appenders to the binary
+    implementation('net.sourceforge.jexcelapi:jxl:2.6.12') {
+        exclude group: 'log4j', module: 'log4j'
+    }
 }
