@@ -1,5 +1,6 @@
 package com.giulio.contentprovider;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Insets;
 import android.os.Build;
@@ -21,6 +22,7 @@ final class SystemBars {
 		View content = activity.findViewById(android.R.id.content);
 		content.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
 			@Override
+			@TargetApi(35) // only installed on Android 15+, see the check above
 			public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
 				Insets bars = insets.getInsets(WindowInsets.Type.systemBars()
 						| WindowInsets.Type.displayCutout()

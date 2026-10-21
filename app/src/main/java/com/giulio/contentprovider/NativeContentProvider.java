@@ -1,29 +1,19 @@
 package com.giulio.contentprovider;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 
-import jxl.Sheet;
-import jxl.Workbook;
-import jxl.write.Label;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
-import jxl.write.biff.RowsExceededException;
 
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -65,7 +55,7 @@ public class NativeContentProvider extends Activity implements showMsg {
              						Manifest.permission.WRITE_CONTACTS},
              	                MY_PERMISSIONS_REQUEST_ExportContacts);
              		} else {
-                		exportContacts(xlsName.getText().toString());
+                		askExportLocation();
              		}
             	}
             });
@@ -104,7 +94,7 @@ public class NativeContentProvider extends Activity implements showMsg {
              						Manifest.permission.WRITE_CONTACTS},
              	                MY_PERMISSIONS_REQUEST_CreateContacts);
              		} else {
-                		createContacts(xlsName.getText().toString());
+                		pickXls(REQ_OPEN_IMPORT);
                 		//toast already inside above call
                 		//showMsg("Completed Importing Contact numbers");
              		}
@@ -126,9 +116,7 @@ public class NativeContentProvider extends Activity implements showMsg {
              						Manifest.permission.WRITE_CONTACTS},
              	                MY_PERMISSIONS_REQUEST_OpenXlsContacts);
              		} else {
-                		openXlsContacts(xlsName.getText().toString());
-
-                		showMsg("Contact numbers .xls opened");
+                		pickXls(REQ_OPEN_LIST);
              		}
             	}
             });
@@ -147,9 +135,7 @@ public class NativeContentProvider extends Activity implements showMsg {
              						Manifest.permission.WRITE_CONTACTS},
              	                MY_PERMISSIONS_REQUEST_MergeContacts);
              		} else {
-                		mergeContacts(xlsName.getText().toString());
-
-                		showMsg("Contact numbers .xls opened");
+                		pickXls(REQ_OPEN_MERGE);
              		}
             	}
             });
@@ -173,7 +159,7 @@ public class NativeContentProvider extends Activity implements showMsg {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                 	EditText xlsName = (EditText)findViewById(R.id.xls_name_open);
-            		exportContacts(xlsName.getText().toString());
+            		askExportLocation();
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -211,7 +197,7 @@ public class NativeContentProvider extends Activity implements showMsg {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                 	EditText xlsName = (EditText)findViewById(R.id.xls_name_open);
-            		createContacts(xlsName.getText().toString());
+            		pickXls(REQ_OPEN_IMPORT);
             		//toast already inside above call
             		//showMsg("Completed Importing Contact numbers");
                 } else {
@@ -230,9 +216,7 @@ public class NativeContentProvider extends Activity implements showMsg {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                 	EditText xlsName = (EditText)findViewById(R.id.xls_name_open);
-            		openXlsContacts(xlsName.getText().toString());
-
-            		showMsg("Contact numbers .xls opened");
+            		pickXls(REQ_OPEN_LIST);
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -249,9 +233,7 @@ public class NativeContentProvider extends Activity implements showMsg {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                 	EditText xlsName = (EditText)findViewById(R.id.xls_name_open);
-            		mergeContacts(xlsName.getText().toString());
-
-            		showMsg("Contact numbers .xls opened");
+            		pickXls(REQ_OPEN_MERGE);
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -271,9 +253,45 @@ public class NativeContentProvider extends Activity implements showMsg {
 	public void showText(String msg) {
 		showMsg(msg);
 	}
-    private void exportContacts(String xlsname) {
-    	ArrayList<Contact> all = Contact.fromAndroid(getContentResolver());
-    	ContactsListActivity.showResult(this, ContactsListActivity.saveContacts2Xls(this, xlsname, all));
+    // Requests to the system file picker (Storage Access Framework).
+    private static final int REQ_SAVE_EXPORT = 101;
+    private static final int REQ_OPEN_LIST = 102;
+    private static final int REQ_OPEN_MERGE = 103;
+    private static final int REQ_OPEN_IMPORT = 104;
+
+    /** Export All: the user picks folder and name, the contacts are written in onActivityResult. */
+    private void askExportLocation() {
+    	EditText xlsName = (EditText)findViewById(R.id.xls_name_open);
+    	XlsFiles.pickSaveLocation(this, xlsName.getText().toString(), null, REQ_SAVE_EXPORT);
+    }
+
+    private void pickXls(final int requestCode) {
+    	XlsFiles.pickFileToOpen(this, requestCode, new XlsFiles.OnPicked() {
+    		@Override
+    		public void onPicked(Uri uri) {
+    			onXlsPicked(requestCode, uri);
+    		}
+    	});
+    }
+
+    private void onXlsPicked(int requestCode, Uri uri) {
+    	switch (requestCode) {
+    		case REQ_OPEN_LIST: openXlsContacts(uri); break;
+    		case REQ_OPEN_MERGE: mergeContacts(uri); break;
+    		case REQ_OPEN_IMPORT: createContacts(uri); break;
+    	}
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	super.onActivityResult(requestCode, resultCode, data);
+    	if (resultCode != RESULT_OK || data == null || data.getData() == null) return;
+    	if (requestCode == REQ_SAVE_EXPORT) {
+    		ArrayList<Contact> all = Contact.fromAndroid(getContentResolver());
+    		XlsFiles.showResult(this, XlsFiles.save(this, data.getData(), all));
+    	} else {
+    		onXlsPicked(requestCode, data.getData());
+    	}
     }
     
     protected static void createContact(String name, String phone, String type, String account) {
@@ -324,10 +342,11 @@ public class NativeContentProvider extends Activity implements showMsg {
 
     }
     
-    private void openXlsContacts(String xlsname) {
+    private void openXlsContacts(Uri uri) {
     	try {
         	Intent contactsListIntent = new Intent(thisClass, ContactsListActivity.class);
-    		contactsListIntent.putExtra("open_xls_name", xlsname);
+    		contactsListIntent.putExtra(XlsFiles.EXTRA_URI, uri);
+    		contactsListIntent.putExtra(XlsFiles.EXTRA_NAME, XlsFiles.displayName(this, uri));
         	startActivity(contactsListIntent);
     		
     	} catch(Exception e) {
@@ -335,10 +354,11 @@ public class NativeContentProvider extends Activity implements showMsg {
     	}
     }
     
-    private void mergeContacts(String xlsname) {
+    private void mergeContacts(Uri uri) {
     	try {
         	Intent mergeIntent = new Intent(thisClass, MergeContactactivity.class);
-        	mergeIntent.putExtra("open_xls_name", xlsname);
+        	mergeIntent.putExtra(XlsFiles.EXTRA_URI, uri);
+        	mergeIntent.putExtra(XlsFiles.EXTRA_NAME, XlsFiles.displayName(this, uri));
         	startActivity(mergeIntent);
     		
     	} catch(Exception e) {
@@ -349,52 +369,25 @@ public class NativeContentProvider extends Activity implements showMsg {
     private void selectXlsContacts(String xlsname) {
     	try {
 			Intent selectContactIntent = new Intent(thisClass, SelectContactActivity.class);
-			selectContactIntent.putExtra("open_xls_name", xlsname);
+			selectContactIntent.putExtra(XlsFiles.EXTRA_NAME, xlsname);
 			startActivity(selectContactIntent);
 		} catch (Exception e) {
     		showMsg(e.toString());
 		}
     }
     
-    private void createContacts(String xlsname) {
-
-
-    	Workbook wb;
-    	Sheet sheet;
-    	int row=1;
-    	// Same folder the exports are saved to (the old /sdcard/Contacts2Xls is unreadable with scoped storage).
-    	File wbfile = new File(ContactsListActivity.xlsDir(this), xlsname.trim());
+    private void createContacts(Uri source) {
+    	ArrayList<Contact> contacts;
     	try {
-			 wb = jxl.Workbook.getWorkbook(wbfile);
-			 sheet = wb.getSheet("Contacts");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			Toast.makeText(NativeContentProvider.this,e.getMessage(), Toast.LENGTH_SHORT).show();
-			return;
-		}
-    	
-    	
-    	row = 1;
-    	String name=sheet.getCell(1, row).getContents();
-    	String phone=sheet.getCell(2, row).getContents();
-    	String type=sheet.getCell(3, row).getContents();
-    	String account=sheet.getCell(4, row).getContents();
-    	int rows = sheet.getRows();
-    	while (name != null && name.length()>0)
-    	{
-    		createContact(name,phone, type, account);
-    		row++;
-    		if (row == rows) break;
-    		name=sheet.getCell(1, row).getContents();
-    		phone=sheet.getCell(2, row).getContents();
-    		type=sheet.getCell(3, row).getContents();
-    		account=sheet.getCell(4, row).getContents();
+    		contacts = XlsFiles.read(this, source);
+    	} catch (Exception e) {
+    		XlsFiles.showResult(this, "Import failed: " + XlsFiles.errorText(e));
+    		return;
     	}
-    	
-    	
-    	wb.close();
-    	Toast.makeText(NativeContentProvider.this, "Imported contacts from: " + wbfile.getAbsolutePath(), Toast.LENGTH_LONG).show();
-    	
+    	for (Contact c : contacts) {
+    		createContact(c.name, c.number, c.type, c.account);
+    	}
+    	Toast.makeText(NativeContentProvider.this, "Imported contacts from: " + XlsFiles.displayName(this, source), Toast.LENGTH_LONG).show();
     }
 
     

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +13,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class SelectContactActivity extends Activity {
+
+	private static final int REQ_SAVE = 1;
 
     private void showMsg(String msg) {
     	Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
@@ -28,7 +31,7 @@ public class SelectContactActivity extends Activity {
 		setContentView(R.layout.contactlist);
 		SystemBars.applyInsets(this);
 
-		String open_xls_name = getIntent().getStringExtra("open_xls_name");
+		String suggestedName = getIntent().getStringExtra(XlsFiles.EXTRA_NAME);
 		// Start each visit with an empty export list, not the leftovers of the previous one.
 		saveMe = new ArrayList<Contact>();
 		// "New" adds to the xls list of the Open screen, it has no meaning here.
@@ -46,22 +49,29 @@ public class SelectContactActivity extends Activity {
 			showMsg(e.toString());
 		}
 		final EditText xlsName = (EditText)this.findViewById(R.id.xls_name_save);
-		if (open_xls_name != null) {
-			xlsName.setText(open_xls_name);
+		if (suggestedName != null) {
+			xlsName.setText(suggestedName);
 		}
 		Button saveBt = (Button) this.findViewById(R.id.saveitems_bt);
 		saveBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
             	if (saveMe.isEmpty()) {
-            		ContactsListActivity.showResult(SelectContactActivity.this,
+            		XlsFiles.showResult(SelectContactActivity.this,
             				"Nothing to save yet: tap Export on the contacts you want in the file.");
             		return;
             	}
-            	ContactsListActivity.showResult(SelectContactActivity.this,
-            			ContactsListActivity.saveContacts2Xls(SelectContactActivity.this, xlsName.getText().toString(), saveMe));
+            	XlsFiles.pickSaveLocation(SelectContactActivity.this, xlsName.getText().toString(), null, REQ_SAVE);
             }
         });
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == REQ_SAVE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+			XlsFiles.showResult(this, XlsFiles.save(this, data.getData(), saveMe));
+		}
 	}
 
 }

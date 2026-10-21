@@ -18,6 +18,7 @@ import android.widget.Toast;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 
 
 
@@ -80,46 +81,16 @@ public class Contact {
 		return arrayOfContacts;
     }
     
-	public static ArrayList<Contact> fromXls(Context context, String xlsname, showMsg delegate) {
-		ArrayList<Contact> contacts = new ArrayList<Contact>();
-        
-		Workbook wb;
-    	Sheet sheet;
-    	int row=1;
-    	if (xlsname == null || xlsname.trim().length() == 0) {
-    		delegate.showText("Please enter a file name.");
-    		return contacts;
-    	}
-    	try {
-    		File wbfile = new File(ContactsListActivity.xlsDir(context), xlsname.trim());
-			 wb = jxl.Workbook.getWorkbook(wbfile);
-			 sheet = wb.getSheet("Contacts");
-		} catch (Exception e) {
-			delegate.showText(e.getMessage() != null ? e.getMessage() : e.toString());
-			return contacts;
+	public static ArrayList<Contact> fromXls(Context context, Uri source, showMsg delegate) {
+		if (source == null) {
+			delegate.showText("No file was chosen.");
+			return new ArrayList<Contact>();
 		}
-    	
-    	
-    	row = 1;
-    	String name=sheet.getCell(1, row).getContents();
-    	String phone=sheet.getCell(2, row).getContents();
-    	String type=sheet.getCell(3, row).getContents();
-    	String account=sheet.getCell(4, row).getContents();
-    	int rows = sheet.getRows();
-    	while (name != null && name.length()>0)
-    	{
-    		//createContact(name,phone, type, account);
-    		contacts.add(new Contact(name, phone, type, account, false));
-    		row++;
-    		if (row == rows) break;
-    		name=sheet.getCell(1, row).getContents();
-    		phone=sheet.getCell(2, row).getContents();
-    		type=sheet.getCell(3, row).getContents();
-    		account=sheet.getCell(4, row).getContents();
-    	}
-    	wb.close();
-    	ContactComparator comp = new ContactComparator();
-    	Collections.sort(contacts, comp);
-    	return contacts;
+		try {
+			return XlsFiles.read(context, source);
+		} catch (Exception e) {
+			delegate.showText(XlsFiles.errorText(e));
+			return new ArrayList<Contact>();
+		}
 	}
 }
