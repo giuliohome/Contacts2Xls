@@ -1,39 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
-		
-		<Button		    	android:layout_alignParentTop="true"
-				android:id="@+id/newitem_bt" 
-				android:text="@string/newitem_bt"
-				android:layout_width="wrap_content" 
-				android:layout_height="wrap_content" />
-<ListView 
-    android:layout_below="@+id/newitem_bt"
-    android:layout_above="@+id/saveitems_ll"
-    android:id="@+id/lvContactItems"
-    android:text="@+id/lvContactItems"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content" >
-   
-</ListView>
+    android:orientation="vertical">
 
-<LinearLayout  android:orientation="horizontal"
-    	android:layout_alignParentBottom="true"
-				android:id="@+id/saveitems_ll"
-		android:layout_width="match_parent" 
-		android:layout_height="wrap_content" >
-<Button
-		android:id="@+id/saveitems_bt" 
-		android:text="@string/saveitems_bt" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" />
-<EditText  
-		android:id="@+id/xls_name_save" 
-		android:text="@string/xls_name_save" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" />
+    <!-- Kept above the list so the system navigation bar and the keyboard never cover it -->
+    <LinearLayout
+        android:id="@+id/saveitems_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/newitem_bt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/newitem_bt" />
+
+        <EditText
+            android:id="@+id/xls_name_save"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/xls_name_hint"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:maxLines="1"
+            android:text="@string/xls_name_save" />
+
+        <Button
+            android:id="@+id/saveitems_bt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/saveitems_bt" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/lvContactItems"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
 </LinearLayout>
-
-</RelativeLayout>

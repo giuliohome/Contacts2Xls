@@ -45,6 +45,7 @@ public class NativeContentProvider extends Activity implements showMsg {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nativecontentprovider);
+        SystemBars.applyInsets(this);
         thisClass = this;
 
             Button view = (Button)findViewById(R.id.viewButton);
@@ -61,12 +62,10 @@ public class NativeContentProvider extends Activity implements showMsg {
              		        != PackageManager.PERMISSION_GRANTED) {
              			ActivityCompat.requestPermissions(thisClass,
              	                new String[]{Manifest.permission.READ_CONTACTS,
-             						Manifest.permission.WRITE_CONTACTS,
-             						Manifest.permission.WRITE_EXTERNAL_STORAGE},
+             						Manifest.permission.WRITE_CONTACTS},
              	                MY_PERMISSIONS_REQUEST_ExportContacts);
              		} else {
-                		exportContacts(getApplicationContext(),xlsName.getText().toString());
-                		showMsg("Completed Exporting Contact numbers");
+                		exportContacts(xlsName.getText().toString());
              		}
             	}
             });
@@ -105,7 +104,7 @@ public class NativeContentProvider extends Activity implements showMsg {
              						Manifest.permission.WRITE_CONTACTS},
              	                MY_PERMISSIONS_REQUEST_CreateContacts);
              		} else {
-                		createContacts("/Contacts2Xls",xlsName.getText().toString());
+                		createContacts(xlsName.getText().toString());
                 		//toast already inside above call
                 		//showMsg("Completed Importing Contact numbers");
              		}
@@ -174,8 +173,7 @@ public class NativeContentProvider extends Activity implements showMsg {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                 	EditText xlsName = (EditText)findViewById(R.id.xls_name_open);
-            		exportContacts(getApplicationContext(),xlsName.getText().toString());
-            		showMsg("Completed Exporting Contact numbers");
+            		exportContacts(xlsName.getText().toString());
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -213,7 +211,7 @@ public class NativeContentProvider extends Activity implements showMsg {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                 	EditText xlsName = (EditText)findViewById(R.id.xls_name_open);
-            		createContacts("/Contacts2Xls",xlsName.getText().toString());
+            		createContacts(xlsName.getText().toString());
             		//toast already inside above call
             		//showMsg("Completed Importing Contact numbers");
                 } else {
@@ -273,80 +271,9 @@ public class NativeContentProvider extends Activity implements showMsg {
 	public void showText(String msg) {
 		showMsg(msg);
 	}
-    private void exportContacts(Context context, String xlsname) {
-    	WritableWorkbook wb;
-    	WritableSheet sheet;
-    	int row=1;
-    	try {
-    		// File sdCard = Environment.getExternalStorageDirectory();
-    		File dir = context.getExternalFilesDir(null);
-					// new File(sdCard.getAbsolutePath() + path);
-    		dir.mkdirs();
-    		File wbfile = new File(dir,xlsname);
-			 wb = jxl.Workbook.createWorkbook(wbfile);
-			 sheet = wb.createSheet("Contacts",1);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			Toast.makeText(NativeContentProvider.this,e.getMessage(), Toast.LENGTH_SHORT).show();
-			return;
-		}
-    	ContentResolver cr = getContentResolver();
-    	
-        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
-                null, null, null, null);
-        if (cur.getCount() > 0) {
-        	while (cur.moveToNext()) {
-        		String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
-        		String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-        		if (Integer.parseInt(cur.getString(
-                        cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
-                     Cursor pCur = cr.query(
-                    		 ContactsContract.CommonDataKinds.Phone.CONTENT_URI, 
-                    		 null, 
-                    		 ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?", 
-                    		 new String[]{id}, null);
-                     while (pCur.moveToNext()) {
-                    	 String phoneNo = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    	 //Toast.makeText(NativeContentProvider.this, "Name: " + name + ", Phone No: " + phoneNo, Toast.LENGTH_SHORT).show();
-                    	 String type = pCur.getString(pCur.getColumnIndex(ContactsContract.RawContacts.ACCOUNT_TYPE));
-                    	 String account = pCur.getString(pCur.getColumnIndex(ContactsContract.RawContacts.ACCOUNT_NAME));
-                    	 
-                    	 if (name == null) continue;
-                    	 Label label1 = new Label(1,row,name);
-                    	 Label label2 = new Label(2,row,phoneNo);
-                    	 Label label3 = new Label(3,row,type);
-                    	 Label label4 = new Label(4,row,account);
-                    	 
-                    	 
-                    	 row++;
-                    	 try {
-							sheet.addCell(label1);
-							sheet.addCell(label2);
-							sheet.addCell(label3);
-							sheet.addCell(label4);
-						} catch (RowsExceededException e) {
-							Toast.makeText(NativeContentProvider.this,e.getMessage(), Toast.LENGTH_SHORT).show();
-							return;
-						} catch (WriteException e) {
-							Toast.makeText(NativeContentProvider.this,e.getMessage(), Toast.LENGTH_SHORT).show();
-							return;
-						}
-                     } 
-                     
-      	        pCur.close();
-      	    }
-        	}
-        }
-        try {
-        	wb.write();
-			wb.close();
-		} catch (WriteException e) {
-			Toast.makeText(NativeContentProvider.this,e.getMessage(), Toast.LENGTH_SHORT).show();
-			return;
-		} catch (IOException e) {
-			Toast.makeText(NativeContentProvider.this,e.getMessage(), Toast.LENGTH_SHORT).show();
-			return;
-		}
+    private void exportContacts(String xlsname) {
+    	ArrayList<Contact> all = Contact.fromAndroid(getContentResolver());
+    	ContactsListActivity.showResult(this, ContactsListActivity.saveContacts2Xls(this, xlsname, all));
     }
     
     protected static void createContact(String name, String phone, String type, String account) {
@@ -429,17 +356,15 @@ public class NativeContentProvider extends Activity implements showMsg {
 		}
     }
     
-    private void createContacts(String path, String xlsname) {
+    private void createContacts(String xlsname) {
 
-        
+
     	Workbook wb;
     	Sheet sheet;
     	int row=1;
+    	// Same folder the exports are saved to (the old /sdcard/Contacts2Xls is unreadable with scoped storage).
+    	File wbfile = new File(ContactsListActivity.xlsDir(this), xlsname.trim());
     	try {
-    		File sdCard = Environment.getExternalStorageDirectory();
-    		File dir = new File(sdCard.getAbsolutePath() + path);
-    		dir.mkdirs();
-    		File wbfile = new File(dir,xlsname);
 			 wb = jxl.Workbook.getWorkbook(wbfile);
 			 sheet = wb.getSheet("Contacts");
 		} catch (Exception e) {
@@ -467,7 +392,8 @@ public class NativeContentProvider extends Activity implements showMsg {
     	}
     	
     	
-    	Toast.makeText(NativeContentProvider.this, "Imported contacts from folder: " + path, Toast.LENGTH_SHORT).show();
+    	wb.close();
+    	Toast.makeText(NativeContentProvider.this, "Imported contacts from: " + wbfile.getAbsolutePath(), Toast.LENGTH_LONG).show();
     	
     }
 

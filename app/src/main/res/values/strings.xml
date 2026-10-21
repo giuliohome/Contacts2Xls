@@ -24,6 +24,7 @@
 <string name="saveitems_bt">Save</string>
 <string name="xls_name_open">MyExportedContacts.xls</string>
 <string name="xls_name_save">MyExportedContacts.xls</string>
+<string name="xls_name_hint">File name (.xls)</string>
 <string name="ContactListActivity">Contact List</string>
 <string  name="SelectContactActivity">Select Contact</string>
 </resources>

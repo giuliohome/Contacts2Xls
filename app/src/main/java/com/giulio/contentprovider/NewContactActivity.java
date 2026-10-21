@@ -22,7 +22,8 @@ public class NewContactActivity extends Activity implements showMsg {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.new_contact);
-		
+		SystemBars.applyInsets(this);
+
 		final TextView tvName = (TextView) findViewById(R.id.tvName);
 		final TextView tvNumber = (TextView) findViewById(R.id.tvNumber);
 		final TextView tvType = (TextView) findViewById(R.id.tvType);

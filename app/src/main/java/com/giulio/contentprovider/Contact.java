@@ -75,7 +75,8 @@ public class Contact {
         		}
     		}
     	}
-		
+    	cur.close();
+
 		return arrayOfContacts;
     }
     
@@ -85,16 +86,16 @@ public class Contact {
 		Workbook wb;
     	Sheet sheet;
     	int row=1;
+    	if (xlsname == null || xlsname.trim().length() == 0) {
+    		delegate.showText("Please enter a file name.");
+    		return contacts;
+    	}
     	try {
-    		File sdCard = Environment.getExternalStorageDirectory();
-    		File dir = context.getExternalFilesDir(null);
-    		dir.mkdirs();
-    		File wbfile = new File(dir,xlsname);
+    		File wbfile = new File(ContactsListActivity.xlsDir(context), xlsname.trim());
 			 wb = jxl.Workbook.getWorkbook(wbfile);
 			 sheet = wb.getSheet("Contacts");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			delegate.showText(e.getMessage());
+			delegate.showText(e.getMessage() != null ? e.getMessage() : e.toString());
 			return contacts;
 		}
     	
@@ -116,6 +117,7 @@ public class Contact {
     		type=sheet.getCell(3, row).getContents();
     		account=sheet.getCell(4, row).getContents();
     	}
+    	wb.close();
     	ContactComparator comp = new ContactComparator();
     	Collections.sort(contacts, comp);
     	return contacts;

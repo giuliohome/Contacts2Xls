@@ -80,6 +80,10 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
             	Contact contact = (Contact) view.getTag();
                 // Do what you want here...
             	if (contact.export) {
+					if (SelectContactActivity.saveMe.contains(contact)) {
+						NativeContentProvider.showMsg("contact " + contact.name + " is already in the export list");
+						return;
+					}
 					SelectContactActivity.saveMe.add(contact);
 					NativeContentProvider.showMsg("contact " + contact.name + " added to the export list!");
 				} else {
